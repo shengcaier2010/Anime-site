@@ -495,15 +495,16 @@ body {
 
 
 
-/* Persistent background-music control */
+/* Main-site background music control: single button only */
 #animeMusicToggle {
-  position: fixed; right: 18px; bottom: 18px; z-index: 1000002;
+  display: none; position: fixed; right: 18px; bottom: 18px; z-index: 1000002;
   border: 1px solid rgba(0,243,255,.85); border-radius: 999px;
   padding: 11px 16px; color: #fff; background: rgba(5,8,24,.88);
   box-shadow: 0 0 16px rgba(0,243,255,.22); font: 700 12px 'Rajdhani', sans-serif;
   letter-spacing: .08em; cursor: pointer; backdrop-filter: blur(10px);
 }
 #animeMusicToggle:hover { background: rgba(90,20,150,.92); }
+
 /* ===== FULL-SCREEN VIDEO INTRO ===== */
 #animeIntro {
   position: fixed; inset: 0; z-index: 1000000;
@@ -537,17 +538,6 @@ body {
 @keyframes introLogoFloat { from { translate: 0 0; } to { translate: 0 -8px; } }
 @keyframes logoRingSpin { to { transform: rotate(360deg); } }
 @keyframes logoCorePulse { from { filter: drop-shadow(0 0 3px #00f3ff); } to { filter: drop-shadow(0 0 15px #ff2d95); } }
-.anime-intro-actions {
-  position: absolute; z-index: 2; right: max(18px, env(safe-area-inset-right));
-  bottom: max(18px, env(safe-area-inset-bottom)); display: flex; gap: 10px;
-}
-.anime-intro-btn {
-  border: 1px solid rgba(0,243,255,.8); border-radius: 999px;
-  padding: 10px 16px; color: white; background: rgba(5,8,24,.72);
-  font: 700 12px 'Rajdhani', sans-serif; letter-spacing: .12em;
-  cursor: pointer; backdrop-filter: blur(10px); transition: transform .2s, background .2s;
-}
-.anime-intro-btn:hover { transform: translateY(-2px); background: rgba(90,20,150,.85); }
 @keyframes introTitlePulse { from { transform: scale(.98); opacity: .85; } to { transform: scale(1.02); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
   #animeIntro, .anime-intro-logo, .anime-intro-logo *, .anime-logo-ring, .anime-logo-core { transition: none; animation: none; }
@@ -557,7 +547,7 @@ body {
 </head>
 <body>
 
-<button id="animeMusicToggle" type="button" aria-pressed="true" aria-label="Turn background music off">♫ MUSIC ON</button>
+<button id="animeMusicToggle" type="button" aria-pressed="false" aria-label="Turn background music on">♫ MUSIC OFF</button>
 
 <!-- ANIME HUB INTRO VIDEO: shown for about 3 seconds after a successful password login -->
 <section id="animeIntro" aria-label="Anime Hub intro video">
@@ -584,10 +574,6 @@ body {
       </g>
       <g fill="#fff"><path d="M43 73 l5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5z"/><path d="M270 70 l4 9 9 4 -9 4 -4 9 -4 -9 -9 -4 9 -4z"/><circle cx="55" cy="183" r="3"/><circle cx="265" cy="183" r="3"/></g>
     </svg>
-  </div>
-  <div class="anime-intro-actions">
-    <button class="anime-intro-btn" id="introSoundBtn" type="button" aria-label="Turn intro sound on">♪ SOUND OFF</button>
-    <button class="anime-intro-btn" id="skipAnimeIntro" type="button">SKIP INTRO »</button>
   </div>
 </section>
 
@@ -1476,6 +1462,8 @@ window.onload = function() {
   // Keep the unlock state for this browser tab only.
   if (sessionStorage.getItem("animeHubUnlocked") === "true") {
     showMainSite(false);
+    const musicButton = document.getElementById("animeMusicToggle");
+    if (musicButton) musicButton.style.display = "block";
   }
 
   toggleButton.addEventListener("click", () => {
@@ -1502,10 +1490,19 @@ window.onload = function() {
         lockScreen.style.display = "none";
         lockScreen.classList.remove("lock-exit");
       }, TRANSITION_MS);
+      if (typeof window.startAnimeHubMusic === "function") window.startAnimeHubMusic();
       if (typeof window.startAnimeHubIntro === "function") {
-        window.startAnimeHubIntro(() => showMainSite(true));
+        window.startAnimeHubIntro(() => {
+          showMainSite(true);
+          const musicButton = document.getElementById("animeMusicToggle");
+          if (musicButton) musicButton.style.display = "block";
+        });
       } else {
-        window.setTimeout(() => showMainSite(true), 3000);
+        window.setTimeout(() => {
+          showMainSite(true);
+          const musicButton = document.getElementById("animeMusicToggle");
+          if (musicButton) musicButton.style.display = "block";
+        }, 3000);
       }
     } else {
       message.style.color = "#ff6b9e";
@@ -1521,9 +1518,7 @@ window.onload = function() {
 (() => {
   const intro = document.getElementById('animeIntro');
   const video = document.getElementById('animeIntroVideo');
-  const skip = document.getElementById('skipAnimeIntro');
-  const sound = document.getElementById('introSoundBtn');
-  if (!intro || !video || !skip || !sound) return;
+  if (!intro || !video) return;
 
   let finished = true;
   let introTimer = null;
@@ -1547,26 +1542,19 @@ window.onload = function() {
   }
 
   window.startAnimeHubIntro = function (onFinish) {
-    if (window.startAnimeHubMusic) window.startAnimeHubMusic();
     if (introTimer) window.clearTimeout(introTimer);
     finishCallback = onFinish;
     finished = false;
     intro.style.display = 'flex';
     intro.classList.remove('intro-exit');
-    // Allow display:flex to apply before starting the fade-in.
     void intro.offsetWidth;
     intro.classList.add('intro-active');
     video.currentTime = 0;
-    // The separate Anime Hub synth soundtrack starts on login and continues after this intro.
     video.muted = true;
     video.play().catch(() => {});
-    sound.textContent = window.animeHubMusicIsOn && window.animeHubMusicIsOn() ? '♫ MUSIC ON' : '♫ MUSIC OFF';
-    sound.setAttribute('aria-label', 'Toggle Anime Hub background music');
-    // Keep the intro on screen for about 3 seconds, regardless of video length.
+    // Intro runs for about 3 seconds, then the main site and music control appear.
     introTimer = window.setTimeout(finishIntro, 3000);
   };
-
-  skip.addEventListener('click', finishIntro);
 })();
 </script>
 
@@ -1578,7 +1566,6 @@ window.onload = function() {
 (() => {
   const audio = document.getElementById('animeHubBackgroundAudio');
   const toggle = document.getElementById('animeMusicToggle');
-  const introToggle = document.getElementById('introSoundBtn');
   if (!audio) return;
 
   audio.loop = true;
@@ -1593,10 +1580,6 @@ window.onload = function() {
       toggle.setAttribute('aria-pressed', String(enabled));
       toggle.setAttribute('aria-label', enabled ? 'Turn background music off' : 'Turn background music on');
     }
-    if (introToggle) {
-      introToggle.textContent = enabled ? '♫ MUSIC ON' : '♫ MUSIC OFF';
-      introToggle.setAttribute('aria-label', enabled ? 'Turn background music off' : 'Turn background music on');
-    }
   }
 
   async function startMusic() {
@@ -1605,7 +1588,7 @@ window.onload = function() {
       enabled = true;
     } catch (error) {
       enabled = false;
-      console.warn('Background music could not start. Make sure background-music.mp3 is in the same folder as this HTML file, then click MUSIC ON.', error);
+      console.warn('Background music could not start. Make sure background-music.mp3 is in the same folder as this HTML file.', error);
     }
     updateButtons();
   }
@@ -1624,7 +1607,6 @@ window.onload = function() {
   };
 
   if (toggle) toggle.addEventListener('click', window.toggleAnimeHubMusic);
-  if (introToggle) introToggle.addEventListener('click', window.toggleAnimeHubMusic);
   audio.addEventListener('play', () => { enabled = true; updateButtons(); });
   audio.addEventListener('pause', () => { enabled = false; updateButtons(); });
   audio.addEventListener('error', () => {
@@ -1635,6 +1617,9 @@ window.onload = function() {
   updateButtons();
 })();
 </script>
+
+
+
 
 </body>
 </html>
