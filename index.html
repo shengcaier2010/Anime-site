@@ -1181,7 +1181,7 @@ const animes = [
   {
     img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGq5J2IpaX2bPy60wYniMNHJRoCIkTgtUVmqV3qAjHbQ&s=10",
     name: "SHOSHIMIN: How to Become Ordinary Season 1",
-    time: "3h 50min",
+    time: "h min",
     dub: "English Dub",
     genre: ["Mystery", "Drama", "Romance", "Slice of Life"],
     type: "episode",
@@ -1190,7 +1190,7 @@ const animes = [
   {
     img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRq8vm5NCd0nvKcnWTt_ktVn6aU3wwVxtAdjdVXglKi3A&s=10",
     name: "SHOSHIMIN: How to Become Ordinary Season 2",
-    time: "4h 29min",
+    time: "h min",
     dub: "English Dub",
     genre: ["Mystery", "Drama", "Romance", "Slice of Life"],
     type: "episode",
@@ -1299,6 +1299,16 @@ function getYouTubeEmbedUrl(url) {
   return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : url;
 }
 
+function openYouTube(index) {
+  const anime = animes[index];
+  if (!anime || !anime.link) {
+    alert('YouTube link is not available!');
+    return;
+  }
+  playCyberSound('click');
+  window.open(anime.link, '_blank', 'noopener,noreferrer');
+}
+
 function openModal(index) {
   playCyberSound('click');
   const a = animes[index];
@@ -1360,8 +1370,8 @@ function createCardHTML(a, originalIndex) {
             ${a.genre.map(g => `<span class="neon-tag neon-tag-genre">${g}</span>`).join('')}
           </div>
         </div>
-        <button class="rgb-btn w-full mt-2" onclick="event.stopPropagation(); openModal(${originalIndex})">
-          <i class="fa-solid fa-circle-play"></i> WATCH NOW
+        <button class="rgb-btn w-full mt-2" onclick="event.stopPropagation(); openYouTube(${originalIndex})">
+          <i class="fa-brands fa-youtube"></i> WATCH NOW
         </button>
       </div>
     </div>
@@ -1657,8 +1667,8 @@ window.onload = function() {
 })();
 </script>
 
-<!-- Background song supplied by the site owner. Keep background-music.m4a beside this HTML file. -->
-<audio id="animeHubBackgroundAudio" src="background-music.m4a" preload="auto" loop></audio>
+<!-- Custom MP3 file: keep background-music.mp3 in the same folder as this HTML file. -->
+<audio id="animeHubBackgroundAudio" src="background-music.mp3" preload="auto" loop></audio>
 
 <script>
 // Local MP3 background music. Browsers require a user gesture before playback.
@@ -1687,7 +1697,7 @@ window.onload = function() {
       enabled = true;
     } catch (error) {
       enabled = false;
-      console.warn('Background music could not start. Make sure background-music.m4a is in the same folder as this HTML file.', error);
+      console.warn('Background music could not start. Make sure background-music.mp3 is in the same folder as this HTML file.', error);
     }
     updateButtons();
   }
@@ -1711,7 +1721,7 @@ window.onload = function() {
   audio.addEventListener('error', () => {
     enabled = false;
     updateButtons();
-    console.warn('Could not load background-music.m4a. Make sure the MP3 file is in the same folder as this HTML file.');
+    console.warn('Could not load background-music.mp3. Make sure the MP3 file is in the same folder as this HTML file.');
   });
   updateButtons();
 })();
