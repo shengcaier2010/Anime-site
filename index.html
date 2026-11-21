@@ -1037,7 +1037,7 @@ const animes = [
   {
     img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxxJ3R8kE92ptEcb2UOEcYYjS65pxUGKpeBNfcBO94gmJ2qImj",
     name: "By the Grace of the Gods Season 1",
-    time: "4h 40min | 12 Eps",
+    time: "1h 40min | 12 Eps",
     dub: "Japanese Dub",
     genre: ["Fantasy", "Slice of Life"],
     type: "episode",
@@ -1657,8 +1657,8 @@ window.onload = function() {
 })();
 </script>
 
-<!-- Custom MP3 file: keep background-music.mp3 in the same folder as this HTML file. -->
-<audio id="animeHubBackgroundAudio" src="background-music.mp3" preload="auto" loop></audio>
+<!-- Background song supplied by the site owner. Keep background-music.m4a beside this HTML file. -->
+<audio id="animeHubBackgroundAudio" src="background-music.m4a" preload="auto" loop></audio>
 
 <script>
 // Local MP3 background music. Browsers require a user gesture before playback.
@@ -1687,7 +1687,7 @@ window.onload = function() {
       enabled = true;
     } catch (error) {
       enabled = false;
-      console.warn('Background music could not start. Make sure background-music.mp3 is in the same folder as this HTML file.', error);
+      console.warn('Background music could not start. Make sure background-music.m4a is in the same folder as this HTML file.', error);
     }
     updateButtons();
   }
@@ -1711,7 +1711,7 @@ window.onload = function() {
   audio.addEventListener('error', () => {
     enabled = false;
     updateButtons();
-    console.warn('Could not load background-music.mp3. Make sure the MP3 file is in the same folder as this HTML file.');
+    console.warn('Could not load background-music.m4a. Make sure the MP3 file is in the same folder as this HTML file.');
   });
   updateButtons();
 })();
