@@ -1667,8 +1667,8 @@ window.onload = function() {
 })();
 </script>
 
-<!-- Custom MP3 file: keep background-music.mp3 in the same folder as this HTML file. -->
-<audio id="animeHubBackgroundAudio" src="background-music.mp3" preload="auto" loop></audio>
+<!-- Keep videoplayback.m4a in the same folder as this HTML file. -->
+<audio id="animeHubBackgroundAudio" src="videoplayback.m4a" preload="auto" loop></audio>
 
 <script>
 // Local MP3 background music. Browsers require a user gesture before playback.
@@ -1697,7 +1697,7 @@ window.onload = function() {
       enabled = true;
     } catch (error) {
       enabled = false;
-      console.warn('Background music could not start. Make sure background-music.mp3 is in the same folder as this HTML file.', error);
+      console.warn('Background music could not start. Make sure videoplayback.m4a is in the same folder as this HTML file.', error);
     }
     updateButtons();
   }
@@ -1721,7 +1721,7 @@ window.onload = function() {
   audio.addEventListener('error', () => {
     enabled = false;
     updateButtons();
-    console.warn('Could not load background-music.mp3. Make sure the MP3 file is in the same folder as this HTML file.');
+    console.warn('Could not load videoplayback.m4a. Make sure the MP3 file is in the same folder as this HTML file.');
   });
   updateButtons();
 })();
